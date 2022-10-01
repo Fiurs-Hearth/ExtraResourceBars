@@ -1,5 +1,5 @@
 # ExtraResourceBars
-A Vanilla WoW AddOn
+A Vanilla WoW AddOn  
 Displays an extra customizable, moveable HP and Power bar.
 
 Customization is saved per character.
