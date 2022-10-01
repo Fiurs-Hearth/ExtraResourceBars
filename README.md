@@ -10,7 +10,7 @@ Video for the addon:
 ![image](https://user-images.githubusercontent.com/97316608/193426611-46078ec2-0b80-4e99-8388-a00c02661059.png)
 
 ## Instructions
-- [Download the addon](https://github.com/Fiurs-Hearth/BattleMusic/archive/refs/heads/main.zip)
+- [Download the addon](https://github.com/Fiurs-Hearth/ExtraResourceBars/archive/refs/heads/master.zip)
 - Unpack the file
 - Open the unpacked file and rename the folder named ExtraResourceBars-master to ExtraResourceBars
 - Put the renamed folder into the AddOns folder: World of Warcraft\Interface\AddOns
