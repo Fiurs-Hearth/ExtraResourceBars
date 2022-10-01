@@ -3,19 +3,12 @@
 
 	<Script file="ExtraResourceBars.lua"/>
 
-	<Frame name="SellValue" parent="GameTooltip" hidden="false">
+	<Frame name="ERB_loader" parent="GameTooltip" hidden="false">
 		<Scripts>
 			<OnLoad>
 				ERB_Load();
 			</OnLoad>
 		</Scripts>
-		<Frames>
-			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT"/>
-				</Anchors>
-			</Frame>
-		</Frames>
 	</Frame>
 
 </Ui>
