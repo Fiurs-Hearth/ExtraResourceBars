@@ -1,0 +1,21 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Script file="ExtraResourceBars.lua"/>
+
+	<Frame name="SellValue" parent="GameTooltip" hidden="false">
+		<Scripts>
+			<OnLoad>
+				ERB_Load();
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+</Ui>
