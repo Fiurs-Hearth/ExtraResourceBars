@@ -9,7 +9,8 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
 ## Examples
 ![image](https://user-images.githubusercontent.com/97316608/193426596-bd0a0d67-e51a-443f-b43f-c8f7f5586221.png)  
 ![image](https://user-images.githubusercontent.com/97316608/193426605-e7b0e5ad-d8aa-45a4-a25d-41319d654d44.png)  
-![image](https://user-images.githubusercontent.com/97316608/193426611-46078ec2-0b80-4e99-8388-a00c02661059.png)
+![image](https://user-images.githubusercontent.com/97316608/193426611-46078ec2-0b80-4e99-8388-a00c02661059.png)  
+![image](https://user-images.githubusercontent.com/97316608/193428515-fd0b033b-640c-4eab-ab5e-03ef15b3122b.png)  
 
 ## Instructions
 - [Download the addon](https://github.com/Fiurs-Hearth/ExtraResourceBars/archive/refs/heads/master.zip)
