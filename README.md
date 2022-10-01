@@ -3,6 +3,7 @@ Displays an extra customazible, moveable HP and Power bar.
 
 Customization is saved per character.
 Video for the addon:
+https://www.youtube.com/watch?v=MjyhXCvZSxw
 
 ## Examples
 ![image](https://user-images.githubusercontent.com/97316608/193426596-bd0a0d67-e51a-443f-b43f-c8f7f5586221.png)  
