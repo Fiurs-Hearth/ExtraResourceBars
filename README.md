@@ -72,7 +72,9 @@ Example:
 /run ERB_options.erb_pp.powers.main="energy"
 ```  
 Will change the power tracking to energy (A must for rogues, druids bar will change automatically)  
+
 ---
+
 Run this to reload UI to apply changes:  
 ```
 /console reloadui
