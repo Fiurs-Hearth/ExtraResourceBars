@@ -32,6 +32,40 @@ local function CheckIfInForm()
     return foundShapeshift
 end
 
+local function ERB_fader(frame, fade_time, fade_in)
+
+    if(fade_time == 0)then
+        if(fade_in)then
+            frame:Show()
+        else
+            frame:Hide()
+        end
+
+        return
+    end
+
+    if(fade_in)then
+        frame:SetAlpha(0)
+        frame.time=0
+    else
+        frame:SetAlpha(1)
+        frame.time=1
+    end
+    frame:SetScript("OnUpdate", function()
+        this.time = this.time + (arg1/fade_time) * (fade_in and 1 or -1)
+        this:SetAlpha( this.time)
+        if(this.time >= 1 and fade_in)then
+            this:SetAlpha(1)
+            this:SetScript("OnUpdate", nil)
+        elseif(this.time <= 0 and not(fade_in))then
+            this:SetAlpha(0)
+            this:SetScript("OnUpdate", nil)
+            this:Hide()
+        end
+    end)
+
+end
+
 function CreateBar(name, type)
 
     local frame
@@ -105,7 +139,10 @@ function ERB_Load()
                     border = 3,
                     background = true,
                     backgroundColor = {0,0,0,0.35},
-                    type = 1
+                    type = 1,
+                    only_combat = false,
+                    fade_in_time = 0.2,
+                    fade_out_time = 0.2,
                 },
                 erb_pp = {
                     frame = pp,
@@ -128,7 +165,10 @@ function ERB_Load()
                     border = 3,
                     background = true,
                     backgroundColor = {0,0,0,0.45},
-                    type = 2
+                    type = 2,
+                    only_combat = false,
+                    fade_in_time = 0.2,
+                    fade_out_time = 0.2,
                 }
             }
         end
@@ -274,6 +314,19 @@ function ERB_Load()
 
             v.frame:SetScript("OnEvent", function()
                 
+                if(ERB_options[this:GetName()]['only_combat'])then
+                    -- fade in
+                    if(event == "PLAYER_REGEN_DISABLED") then
+                        this:Show()
+                        ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], true)
+                    end
+                    -- fade out
+                    if(event == "PLAYER_REGEN_ENABLED")then
+                        this:Show()
+                        ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], false)
+                    end
+                end
+
                 local u = arg1
                 local form = false
                 if(u == "player")then
@@ -347,6 +400,19 @@ function ERB_Load()
                 v.frame:RegisterEvent("UNIT_ENERGY")
                 v.frame:RegisterEvent("UNIT_MAXENERGY")
             	v.frame:RegisterEvent("UNIT_AURA")
+            end
+            if(v.only_combat)then
+                v.frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+                v.frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+                _G[k]:Hide()
+
+                -- Fixes added new value
+                if(not(ERB_options[k]['fade_in_time']))then
+                    ERB_options[k]['fade_in_time'] = 0.2
+                end
+                if(not(ERB_options[k]['fade_out_time']))then
+                    ERB_options[k]['fade_out_time'] = 0.2
+                end
             end
 
         end
