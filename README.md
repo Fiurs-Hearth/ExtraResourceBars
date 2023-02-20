@@ -33,7 +33,10 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
   bar        (1-26, 0 for no bar texture)  
   border     (1-4, 0 for no border texture)  
   background (true or false)  
-  backgroundColor (Accepts 3-4 numbers from 0-1 like this (Red, Green, Color, Alpha): {0, 0, 0, 0.45} )  
+  backgroundColor (Accepts 3-4 numbers from 0-1 like this (Red, Green, Color, Alpha): {0, 0, 0, 0.45} )
+  only_combat (true or false) Defaults to false
+  fade_in_time (Any number) (example: 0.4)
+  fade_out_time (Any number) (example: 0.4)
     
   Unique for HP bar:
   color         (Accepts 3-4 numbers from 0-1 like this (Red, Green, Color, Alpha): {0.2, 0.2, 1} )  Only works if gradiantHP is set to false.
