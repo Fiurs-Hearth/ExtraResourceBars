@@ -19,6 +19,10 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
 - Put the renamed folder into the AddOns folder: World of Warcraft\Interface\AddOns
 - Start or restart WoW if already running
 
+**IF YOU CANT MOVE A FRAME THEN SET ITS "under" VALUE TO NIL**  
+For example, if you can't move the power bar then run this command:  
+```/run ERB_options.erb_pp.under = nil```
+
 ### Changeable options and accepted inputs
 ```
   hide       (true or false)  
@@ -28,7 +32,7 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
   fontSize   (Any number)  
   textType   (0, 1, 2, 3, 4)  
   textAlign  ("LEFT", "CENTER", "RIGHT")  
-  under      ("erb_hp" or any other frame, for example, "PlayerFrame")  
+  under      ("erb_hp" or any other frame, for example, "PlayerFrame", set to nil to be able to move the bar again)  
   spacing    (Any number, for example, 5 or -10)  
   bar        (1-26, 0 for no bar texture)  
   border     (1-4, 0 for no border texture)  
