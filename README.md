@@ -12,6 +12,11 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
 ![image](https://user-images.githubusercontent.com/97316608/193426611-46078ec2-0b80-4e99-8388-a00c02661059.png)  
 ![image](https://user-images.githubusercontent.com/97316608/193428515-fd0b033b-640c-4eab-ab5e-03ef15b3122b.png)  
 
+## Config menu (Open by typing "/erb")
+![image](https://github.com/user-attachments/assets/4855c131-6f24-4130-bc2d-168918681dec)  
+Open by typing "/erb", [See how to edit here!](https://github.com/Fiurs-Hearth/ExtraResourceBars?tab=readme-ov-file#changeable-options-and-accepted-inputs)
+
+
 ## Instructions
 - [Download the addon](https://github.com/Fiurs-Hearth/ExtraResourceBars/archive/refs/heads/master.zip)
 - Unpack the file
