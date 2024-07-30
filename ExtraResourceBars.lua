@@ -51,18 +51,23 @@ local function ERB_fader(frame, fade_time, fade_in)
         frame:SetAlpha(1)
         frame.time=1
     end
-    frame:SetScript("OnUpdate", function()
-        this.time = this.time + (arg1/fade_time) * (fade_in and 1 or -1)
-        this:SetAlpha( this.time)
-        if(this.time >= 1 and fade_in)then
-            this:SetAlpha(1)
-            this:SetScript("OnUpdate", nil)
-        elseif(this.time <= 0 and not(fade_in))then
-            this:SetAlpha(0)
-            this:SetScript("OnUpdate", nil)
-            this:Hide()
-        end
-    end)
+    if(not(frame.fading))then
+        frame:SetScript("OnUpdate", function()
+            this.time = this.time + (arg1/fade_time) * (fade_in and 1 or -1)
+            this:SetAlpha( this.time)
+            this.fading = true
+            if(this.time >= 1 and fade_in)then
+                this:SetAlpha(1)
+                this:SetScript("OnUpdate", nil)
+                this.fading = false
+            elseif(this.time <= 0 and not(fade_in))then
+                this:SetAlpha(0)
+                this:SetScript("OnUpdate", nil)
+                this.fading = false
+                this:Hide()
+            end
+        end)
+    end
 
 end
 
@@ -130,6 +135,10 @@ function ERB_apply_settings(data, frame_name)
     if(v.under)then
         v.frame:ClearAllPoints()
         v.frame:SetPoint("CENTER", _G[v.under], "CENTER", 0, -(v.height + v.spacing))
+        v.frame:EnableMouse(false)
+    end
+
+    if(v.moveable == false)then
         v.frame:EnableMouse(false)
     end
 
@@ -255,6 +264,27 @@ function ERB_apply_settings(data, frame_name)
         v.frame.text:SetText((string.format("%.0f%%", (unitPower/maxPower)*100)) .."  "..unitPower.." / "..maxPower)
     end
 
+    if(v.hide_when_full)then
+
+        local unitPower, maxPower
+        if(v.type==1)then
+            unitPower = UnitHealth("player")
+            maxPower = UnitHealthMax("player")
+        elseif(v.type==2)then
+            unitPower = UnitMana("player")
+            maxPower = UnitManaMax("player")
+        end
+
+        if(unitPower == maxPower or v.type == 2 and v.powers.main == "rage" and unitPower == 0) then
+            v.frame:Hide()
+            if(UnitAffectingCombat("player") and v.only_combat)then
+                v.frame:Show()
+            end
+        else
+            v.frame:Show()
+        end
+    end
+
     v.frame:SetScript("OnEvent", function()
         
         if(ERB_options[this:GetName()]['only_combat'])then
@@ -294,6 +324,24 @@ function ERB_apply_settings(data, frame_name)
                     this.bar:SetVertexColor(unpack(ERB_options[this:GetName()].powers[ERB_options[this:GetName()].powers.main]))
                 end
             end
+
+            if(ERB_options[this:GetName()].hide_when_full)then
+                if(unitPower == maxPower or ERB_options[this:GetName()].type == 2 and ERB_options[this:GetName()]['powers'].main == "rage" and unitPower == 0) then
+                    -- Show even when full if only_combat is set to true
+                    if(UnitAffectingCombat("player") and ERB_options[this:GetName()].only_combat)then
+                        ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], true)
+                        this:Show()
+                    else
+                        ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], false)
+                    end
+                else
+                    if(not(this:IsVisible()) or not(this:IsVisible()) and ERB_options[this:GetName()].type == 2 and ERB_options[this:GetName()].powers.main == "rage" and unitPower > 0)then
+                        ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], true)
+                        this:Show()
+                    end
+                end
+            end
+
             this.bar:SetWidth((this:GetWidth() - 8 + (ERB_options[this:GetName()].border==4 and 5 or 0)) * (unitPower/maxPower) + 0.001)
             if(ERB_options[this:GetName()].barResize=="CENTER")then
                 this.bar:SetTexCoord( (1-(unitPower/maxPower))/2, 1-((1-(unitPower/maxPower))/2) + 0.001, 0, 1)
@@ -421,6 +469,10 @@ function ERB_Load()
             }
         end
 
+        if(not(ERB_options.erb_hp.moveable)) then
+            ERB_options.erb_hp.moveable = true
+        end
+
         CONFIG_SETTINGS = {
     
             [1] = {"HP - Hide", "hp_hide", ERB_options.erb_hp.hide, false,                           {"erb_hp", "hide"}},
@@ -438,31 +490,35 @@ function ERB_Load()
             [13] = {"HP - Background", "hp_background", ERB_options.erb_hp.background, true,         {"erb_hp", "background"}},
             [14] = {"HP - Background Color", "hp_backgroundColor", ERB_options.erb_hp.backgroundColor, {0,0,0,0.35}, {"erb_hp", "backgroundColor"}, true},
             [15] = {"HP - Only Combat", "hp_only_combat", ERB_options.erb_hp.only_combat, false,     {"erb_hp", "only_combat"}},
-            [16] = {"HP - Fade in Time", "hp_fade_in_time", ERB_options.erb_hp.fade_in_time, 0.2,    {"erb_hp", "fade_in_time"}},
-            [17] = {"HP - Fade out time", "hp_fade_out_time", ERB_options.erb_hp.fade_out_time, 0.2, {"erb_hp", "fade_out_time"}},
+            [16] = {"HP - Hide When HP is Full", "hp_hide_when_full", ERB_options.erb_hp.hide_when_full, false,     {"erb_hp", "hide_when_full"}},
+            [17] = {"HP - Fade in Time", "hp_fade_in_time", ERB_options.erb_hp.fade_in_time, 0.2,    {"erb_hp", "fade_in_time"}},
+            [18] = {"HP - Fade out time", "hp_fade_out_time", ERB_options.erb_hp.fade_out_time, 0.2, {"erb_hp", "fade_out_time"}},
+            [19] = {"HP - Moveable", "hp_moveable", ERB_options.erb_hp.moveable, true,               {"erb_hp", "moveable"}},
 
-            [18] = {"PP - Hide", "pp_hide", ERB_options.erb_pp.hide, false,                          {"erb_pp", "hide"}},
-            [19] = {"PP - Bar resize ", "pp_barResize", ERB_options.erb_pp.barResize, "LEFT",        {"erb_pp", "barResize"}},
-            [20] = {"PP - Width", "pp_width", ERB_options.erb_pp.width, 124,                         {"erb_pp", "width"}},
-            [21] = {"PP - Height", "pp_height", ERB_options.erb_pp.height, 21,                       {"erb_pp", "height"}},
+            [20] = {"PP - Hide", "pp_hide", ERB_options.erb_pp.hide, false,                          {"erb_pp", "hide"}},
+            [21] = {"PP - Bar resize ", "pp_barResize", ERB_options.erb_pp.barResize, "LEFT",        {"erb_pp", "barResize"}},
+            [22] = {"PP - Width", "pp_width", ERB_options.erb_pp.width, 124,                         {"erb_pp", "width"}},
+            [23] = {"PP - Height", "pp_height", ERB_options.erb_pp.height, 21,                       {"erb_pp", "height"}},
 
-            [22] = {"PP - Main power", "pp_color_main",   ERB_options.erb_pp.powers.main, "mana",         {"erb_pp", "main", "powers"}},
-            [23] = {"PP - Color Mana", "pp_color_mana",   ERB_options.erb_pp.powers.mana, {0.2,0.2,1},    {"erb_pp", "mana", "powers"}, true},
-            [24] = {"PP - Color Rage", "pp_color_rage",   ERB_options.erb_pp.powers.rage, {1,0,0,1},      {"erb_pp", "rage", "powers"}, true},
-            [25] = {"PP - Color Energy", "pp_color_energy", ERB_options.erb_pp.powers.energy, {1,1,0,1},  {"erb_pp", "energy", "powers"}, true},
+            [24] = {"PP - Main power", "pp_color_main",   ERB_options.erb_pp.powers.main, "mana",         {"erb_pp", "main", "powers"}},
+            [25] = {"PP - Color Mana", "pp_color_mana",   ERB_options.erb_pp.powers.mana, {0.2,0.2,1},    {"erb_pp", "mana", "powers"}, true},
+            [26] = {"PP - Color Rage", "pp_color_rage",   ERB_options.erb_pp.powers.rage, {1,0,0,1},      {"erb_pp", "rage", "powers"}, true},
+            [27] = {"PP - Color Energy", "pp_color_energy", ERB_options.erb_pp.powers.energy, {1,1,0,1},  {"erb_pp", "energy", "powers"}, true},
 
-            [26] = {"PP - Font Size", "pp_fontSize", ERB_options.erb_pp.fontSize, 10,                {"erb_pp", "fontSize"}},
-            [27] = {"PP - Text Type", "pp_textType", ERB_options.erb_pp.textType, 1,                 {"erb_pp", "textType"}},
-            [28] = {"PP - Text Align", "pp_textAlign", ERB_options.erb_pp.textAlign, "CENTER",       {"erb_pp", "textAlign"}},
-            [29] = {"PP - Align under frame", "pp_under", ERB_options.erb_pp.under, "erb_hp",        {"erb_pp", "under"}},
-            [30] = {"PP - Spacing", "pp_spacing", ERB_options.erb_pp.spacing, 1,                     {"erb_pp", "spacing"}},
-            [31] = {"PP - Bar", "pp_bar", ERB_options.erb_pp.bar, 4,                                 {"erb_pp", "bar"}},
-            [32] = {"PP - Border", "pp_border", ERB_options.erb_pp.border, 3,                        {"erb_pp", "border"}},
-            [33] = {"PP - Background", "pp_background", ERB_options.erb_pp.background, true,         {"erb_pp", "background"}},
-            [34] = {"PP - Background Color", "pp_backgroundColor", ERB_options.erb_pp.backgroundColor, {0,0,0,0.45}, {"erb_pp", "backgroundColor"}, true},
-            [35] = {"PP - Only Combat", "pp_only_combat", ERB_options.erb_pp.only_combat, false,     {"erb_pp", "only_combat"}},
-            [36] = {"PP - Fade in Time", "pp_fade_in_time", ERB_options.erb_pp.fade_in_time, 0.2,    {"erb_pp", "fade_in_time"}},
-            [37] = {"PP - Fade out time", "pp_fade_out_time", ERB_options.erb_pp.fade_out_time, 0.2, {"erb_pp", "fade_out_time"}},
+            [28] = {"PP - Font Size", "pp_fontSize", ERB_options.erb_pp.fontSize, 10,                {"erb_pp", "fontSize"}},
+            [29] = {"PP - Text Type", "pp_textType", ERB_options.erb_pp.textType, 1,                 {"erb_pp", "textType"}},
+            [30] = {"PP - Text Align", "pp_textAlign", ERB_options.erb_pp.textAlign, "CENTER",       {"erb_pp", "textAlign"}},
+            [31] = {"PP - Align under frame", "pp_under", ERB_options.erb_pp.under, "erb_hp",        {"erb_pp", "under"}},
+            [32] = {"PP - Spacing", "pp_spacing", ERB_options.erb_pp.spacing, 1,                     {"erb_pp", "spacing"}},
+            [33] = {"PP - Bar", "pp_bar", ERB_options.erb_pp.bar, 4,                                 {"erb_pp", "bar"}},
+            [34] = {"PP - Border", "pp_border", ERB_options.erb_pp.border, 3,                        {"erb_pp", "border"}},
+            [35] = {"PP - Background", "pp_background", ERB_options.erb_pp.background, true,         {"erb_pp", "background"}},
+            [36] = {"PP - Background Color", "pp_backgroundColor", ERB_options.erb_pp.backgroundColor, {0,0,0,0.45}, {"erb_pp", "backgroundColor"}, true},
+            [37] = {"PP - Only Combat", "pp_only_combat", ERB_options.erb_pp.only_combat, false,     {"erb_pp", "only_combat"}},
+            [38] = {"PP - Hide When PP is Full", "pp_hide_when_full", ERB_options.erb_pp.hide_when_full, false,     {"erb_pp", "hide_when_full"}},
+            [39] = {"PP - Fade in Time", "pp_fade_in_time", ERB_options.erb_pp.fade_in_time, 0.2,    {"erb_pp", "fade_in_time"}},
+            [40] = {"PP - Fade out time", "pp_fade_out_time", ERB_options.erb_pp.fade_out_time, 0.2, {"erb_pp", "fade_out_time"}},
+            --[39] = {"PP - Moveable", "pp_moveable", ERB_options.erb_pp.moveable, true,               {"erb_pp", "moveable"}},
         }
 
         local unitPower, maxPower
