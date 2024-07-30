@@ -46,10 +46,12 @@ For example, if you can't move the power bar then run this command:
   only_combat (true or false) Defaults to false
   fade_in_time (Any number) (example: 0.4)
   fade_out_time (Any number) (example: 0.4)
+  hide_when_full (true or false) Defaults to false, if only_combat and hide_when_full are both set to true then the bar will be shown in combat regardless if the resource is full or not (out of combat it will only show if its not full)
     
   Unique for HP bar:
   color         (Accepts 3-4 numbers from 0-1 like this (Red, Green, Color, Alpha): {0.2, 0.2, 1} )  Only works if gradiantHP is set to false.
   gradiantHP    (true or false) Gradiant hp color change from green to yellow to red.
+  moveable      (true or false) Defaults to true, when false you wont be able to move the HP bar with the mouse cursor.
     
   Unique for the Power bar:  
   powers = {  
