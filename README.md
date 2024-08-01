@@ -13,7 +13,7 @@ https://www.youtube.com/watch?v=MjyhXCvZSxw
 ![image](https://user-images.githubusercontent.com/97316608/193428515-fd0b033b-640c-4eab-ab5e-03ef15b3122b.png)  
 
 ## Config menu (Open by typing "/erb")
-![image](https://github.com/user-attachments/assets/1efc096c-e1e5-497f-91ed-7efbb7101279)
+![image](https://github.com/user-attachments/assets/c4d0cb1c-d0b5-4924-a9eb-1809131c3400)
 Open by typing "/erb", [See how to edit here!](https://github.com/Fiurs-Hearth/ExtraResourceBars?tab=readme-ov-file#changeable-options-and-accepted-inputs)
 
 
