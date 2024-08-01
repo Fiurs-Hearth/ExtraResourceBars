@@ -152,10 +152,13 @@ function ERB_apply_settings(data, frame_name)
 
     -- Background
     if(v.background)then
+        v.frame.background:Show()
         v.frame.background:SetPoint("CENTER",v.frame,"CENTER",0,0)
         v.frame.background:SetWidth(v.frame:GetWidth()-4 + (v.border==4 and 4 or 0) + (v.border==0 and -2 or 0))
         v.frame.background:SetHeight(v.frame:GetHeight()-5 + (v.border==4 and 5 or 0) + (v.border==0 and 2 or 0))
         v.frame.background:SetBackdropColor(unpack(v.backgroundColor))
+    else
+        v.frame.background:Hide()
     end
     -- For border
     if(v.border==0)then
@@ -199,7 +202,7 @@ function ERB_apply_settings(data, frame_name)
     end
 
     -- gradiant hp
-    if(v.type==1 and v.gradiantHP == true)then
+    if(v.type==1 and v.gradiantHP)then
         local r,g,b
         local healthPercent = UnitHealth("player") / UnitHealthMax("player");	
         if(healthPercent < 0.5)then
@@ -289,14 +292,18 @@ function ERB_apply_settings(data, frame_name)
         
         if(ERB_options[this:GetName()]['only_combat'])then
             -- fade in
-            if(event == "PLAYER_REGEN_DISABLED") then
-                this:Show()
-                ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], true)
-            end
-            -- fade out
-            if(event == "PLAYER_REGEN_ENABLED")then
-                this:Show()
-                ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], false)
+            if(ERB_options[this:GetName()].hide_when_full)then
+
+            else
+                if(event == "PLAYER_REGEN_DISABLED") then
+                    this:Show()
+                    ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], true)
+                end
+                -- fade out
+                if(event == "PLAYER_REGEN_ENABLED")then
+                    this:Show()
+                    ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], false)
+                end
             end
         end
 
@@ -329,8 +336,10 @@ function ERB_apply_settings(data, frame_name)
                 if(unitPower == maxPower or ERB_options[this:GetName()].type == 2 and ERB_options[this:GetName()]['powers'].main == "rage" and unitPower == 0) then
                     -- Show even when full if only_combat is set to true
                     if(UnitAffectingCombat("player") and ERB_options[this:GetName()].only_combat)then
-                        ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], true)
-                        this:Show()
+                        if(not(this:IsVisible()))then
+                            ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], true)
+                            this:Show()
+                        end
                     else
                         ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], false)
                     end
@@ -484,41 +493,39 @@ function ERB_Load()
             [7] = {"HP - Text Type", "hp_textType", ERB_options.erb_hp.textType, 3,                  {"erb_hp", "textType"}},
             [8] = {"HP - Text Align", "hp_textAlign", ERB_options.erb_hp.textAlign, "CENTER",        {"erb_hp", "textAlign"}},
             [9] = {"HP - Gradiant HP", "hp_gradiantHP", ERB_options.erb_hp.gradiantHP, true,         {"erb_hp", "gradiantHP"}},
-            [10] = {"HP - Spacing", "hp_spacing", ERB_options.erb_hp.spacing, 0,                     {"erb_hp", "spacing"}},
-            [11] = {"HP - Bar", "hp_bar", ERB_options.erb_hp.bar, 4,                                 {"erb_hp", "bar"}},
-            [12] = {"HP - Border", "hp_border", ERB_options.erb_hp.border, 3,                        {"erb_hp", "border"}},
-            [13] = {"HP - Background", "hp_background", ERB_options.erb_hp.background, true,         {"erb_hp", "background"}},
-            [14] = {"HP - Background Color", "hp_backgroundColor", ERB_options.erb_hp.backgroundColor, {0,0,0,0.35}, {"erb_hp", "backgroundColor"}, true},
-            [15] = {"HP - Only Combat", "hp_only_combat", ERB_options.erb_hp.only_combat, false,     {"erb_hp", "only_combat"}},
-            [16] = {"HP - Hide When HP is Full", "hp_hide_when_full", ERB_options.erb_hp.hide_when_full, false,     {"erb_hp", "hide_when_full"}},
-            [17] = {"HP - Fade in Time", "hp_fade_in_time", ERB_options.erb_hp.fade_in_time, 0.2,    {"erb_hp", "fade_in_time"}},
-            [18] = {"HP - Fade out time", "hp_fade_out_time", ERB_options.erb_hp.fade_out_time, 0.2, {"erb_hp", "fade_out_time"}},
-            [19] = {"HP - Moveable", "hp_moveable", ERB_options.erb_hp.moveable, true,               {"erb_hp", "moveable"}},
+            [10] = {"HP - Bar", "hp_bar", ERB_options.erb_hp.bar, 4,                                 {"erb_hp", "bar"}},
+            [11] = {"HP - Border", "hp_border", ERB_options.erb_hp.border, 3,                        {"erb_hp", "border"}},
+            [12] = {"HP - Background", "hp_background", ERB_options.erb_hp.background, true,         {"erb_hp", "background"}},
+            [13] = {"HP - Background Color", "hp_backgroundColor", ERB_options.erb_hp.backgroundColor, {0,0,0,0.35}, {"erb_hp", "backgroundColor"}, true},
+            [14] = {"HP - Only Combat", "hp_only_combat", ERB_options.erb_hp.only_combat, false,     {"erb_hp", "only_combat"}},
+            [15] = {"HP - Hide When HP is Full", "hp_hide_when_full", ERB_options.erb_hp.hide_when_full, false,     {"erb_hp", "hide_when_full"}},
+            [16] = {"HP - Fade in Time", "hp_fade_in_time", ERB_options.erb_hp.fade_in_time, 0.2,    {"erb_hp", "fade_in_time"}},
+            [17] = {"HP - Fade out time", "hp_fade_out_time", ERB_options.erb_hp.fade_out_time, 0.2, {"erb_hp", "fade_out_time"}},
+            [18] = {"HP - Moveable", "hp_moveable", ERB_options.erb_hp.moveable, true,               {"erb_hp", "moveable"}},
 
-            [20] = {"PP - Hide", "pp_hide", ERB_options.erb_pp.hide, false,                          {"erb_pp", "hide"}},
-            [21] = {"PP - Bar resize ", "pp_barResize", ERB_options.erb_pp.barResize, "LEFT",        {"erb_pp", "barResize"}},
-            [22] = {"PP - Width", "pp_width", ERB_options.erb_pp.width, 124,                         {"erb_pp", "width"}},
-            [23] = {"PP - Height", "pp_height", ERB_options.erb_pp.height, 21,                       {"erb_pp", "height"}},
+            [19] = {"PP - Hide", "pp_hide", ERB_options.erb_pp.hide, false,                          {"erb_pp", "hide"}},
+            [20] = {"PP - Bar resize ", "pp_barResize", ERB_options.erb_pp.barResize, "LEFT",        {"erb_pp", "barResize"}},
+            [21] = {"PP - Width", "pp_width", ERB_options.erb_pp.width, 124,                         {"erb_pp", "width"}},
+            [22] = {"PP - Height", "pp_height", ERB_options.erb_pp.height, 21,                       {"erb_pp", "height"}},
 
-            [24] = {"PP - Main power", "pp_color_main",   ERB_options.erb_pp.powers.main, "mana",         {"erb_pp", "main", "powers"}},
-            [25] = {"PP - Color Mana", "pp_color_mana",   ERB_options.erb_pp.powers.mana, {0.2,0.2,1},    {"erb_pp", "mana", "powers"}, true},
-            [26] = {"PP - Color Rage", "pp_color_rage",   ERB_options.erb_pp.powers.rage, {1,0,0,1},      {"erb_pp", "rage", "powers"}, true},
-            [27] = {"PP - Color Energy", "pp_color_energy", ERB_options.erb_pp.powers.energy, {1,1,0,1},  {"erb_pp", "energy", "powers"}, true},
+            [23] = {"PP - Main power", "pp_color_main",   ERB_options.erb_pp.powers.main, "mana",         {"erb_pp", "main", "powers"}},
+            [24] = {"PP - Color Mana", "pp_color_mana",   ERB_options.erb_pp.powers.mana, {0.2,0.2,1},    {"erb_pp", "mana", "powers"}, true},
+            [25] = {"PP - Color Rage", "pp_color_rage",   ERB_options.erb_pp.powers.rage, {1,0,0,1},      {"erb_pp", "rage", "powers"}, true},
+            [26] = {"PP - Color Energy", "pp_color_energy", ERB_options.erb_pp.powers.energy, {1,1,0,1},  {"erb_pp", "energy", "powers"}, true},
 
-            [28] = {"PP - Font Size", "pp_fontSize", ERB_options.erb_pp.fontSize, 10,                {"erb_pp", "fontSize"}},
-            [29] = {"PP - Text Type", "pp_textType", ERB_options.erb_pp.textType, 1,                 {"erb_pp", "textType"}},
-            [30] = {"PP - Text Align", "pp_textAlign", ERB_options.erb_pp.textAlign, "CENTER",       {"erb_pp", "textAlign"}},
-            [31] = {"PP - Align under frame", "pp_under", ERB_options.erb_pp.under, "erb_hp",        {"erb_pp", "under"}},
-            [32] = {"PP - Spacing", "pp_spacing", ERB_options.erb_pp.spacing, 1,                     {"erb_pp", "spacing"}},
-            [33] = {"PP - Bar", "pp_bar", ERB_options.erb_pp.bar, 4,                                 {"erb_pp", "bar"}},
-            [34] = {"PP - Border", "pp_border", ERB_options.erb_pp.border, 3,                        {"erb_pp", "border"}},
-            [35] = {"PP - Background", "pp_background", ERB_options.erb_pp.background, true,         {"erb_pp", "background"}},
-            [36] = {"PP - Background Color", "pp_backgroundColor", ERB_options.erb_pp.backgroundColor, {0,0,0,0.45}, {"erb_pp", "backgroundColor"}, true},
-            [37] = {"PP - Only Combat", "pp_only_combat", ERB_options.erb_pp.only_combat, false,     {"erb_pp", "only_combat"}},
-            [38] = {"PP - Hide When PP is Full", "pp_hide_when_full", ERB_options.erb_pp.hide_when_full, false,     {"erb_pp", "hide_when_full"}},
-            [39] = {"PP - Fade in Time", "pp_fade_in_time", ERB_options.erb_pp.fade_in_time, 0.2,    {"erb_pp", "fade_in_time"}},
-            [40] = {"PP - Fade out time", "pp_fade_out_time", ERB_options.erb_pp.fade_out_time, 0.2, {"erb_pp", "fade_out_time"}},
-            --[39] = {"PP - Moveable", "pp_moveable", ERB_options.erb_pp.moveable, true,               {"erb_pp", "moveable"}},
+            [27] = {"PP - Font Size", "pp_fontSize", ERB_options.erb_pp.fontSize, 10,                {"erb_pp", "fontSize"}},
+            [28] = {"PP - Text Type", "pp_textType", ERB_options.erb_pp.textType, 1,                 {"erb_pp", "textType"}},
+            [29] = {"PP - Text Align", "pp_textAlign", ERB_options.erb_pp.textAlign, "CENTER",       {"erb_pp", "textAlign"}},
+            [30] = {"PP - Align under frame", "pp_under", ERB_options.erb_pp.under, "erb_hp",        {"erb_pp", "under"}},
+            [31] = {"PP - Spacing", "pp_spacing", ERB_options.erb_pp.spacing, 1,                     {"erb_pp", "spacing"}},
+            [32] = {"PP - Bar", "pp_bar", ERB_options.erb_pp.bar, 4,                                 {"erb_pp", "bar"}},
+            [33] = {"PP - Border", "pp_border", ERB_options.erb_pp.border, 3,                        {"erb_pp", "border"}},
+            [34] = {"PP - Background", "pp_background", ERB_options.erb_pp.background, true,         {"erb_pp", "background"}},
+            [35] = {"PP - Background Color", "pp_backgroundColor", ERB_options.erb_pp.backgroundColor, {0,0,0,0.45}, {"erb_pp", "backgroundColor"}, true},
+            [36] = {"PP - Only Combat", "pp_only_combat", ERB_options.erb_pp.only_combat, false,     {"erb_pp", "only_combat"}},
+            [37] = {"PP - Hide When PP is Full", "pp_hide_when_full", ERB_options.erb_pp.hide_when_full, false,     {"erb_pp", "hide_when_full"}},
+            [38] = {"PP - Fade in Time", "pp_fade_in_time", ERB_options.erb_pp.fade_in_time, 0.2,    {"erb_pp", "fade_in_time"}},
+            [39] = {"PP - Fade out time", "pp_fade_out_time", ERB_options.erb_pp.fade_out_time, 0.2, {"erb_pp", "fade_out_time"}},
         }
 
         local unitPower, maxPower
@@ -536,7 +543,7 @@ end
 local CONFIG_FRAME_NAME = "erb_config"
 local NR_OF_COLUMNS = 4
 local INPUT_HEIGHT = 40
-local INPUT_WIDTH = 150
+local INPUT_WIDTH = 156
 local SPACING_X = 18
 local SPACING_Y = 45
 
@@ -627,34 +634,54 @@ local function CreateInputField(text, name, column, row, data, isColor)
     end
 end
 
+local function CreateCheckbox(text, name, column, row, data, isColor)
+
+    local currentEditBox
+
+    if(not _G[CONFIG_FRAME_NAME..name])then
+        currentEditBox = CreateFrame("CheckButton", CONFIG_FRAME_NAME.."_"..name, _G[CONFIG_FRAME_NAME], "OptionsCheckButtonTemplate")
+    end
+
+    _G[CONFIG_FRAME_NAME.."_"..name.."Text"]:SetText(text)
+
+    currentEditBox:SetPoint(
+        "TOPLEFT",
+        17 + ((INPUT_WIDTH + SPACING_X) * (column)),
+        -20 - (row * SPACING_Y)
+    )
+    currentEditBox:SetChecked(data)
+    currentEditBox:Show()
+end
+
 local function SaveData()
     for k,v in pairs(CONFIG_SETTINGS)do
 
         local frame = _G[CONFIG_FRAME_NAME.."_"..v[2]]
-        local input_data = frame:GetText()
-        if(input_data == "" or input_data == "nil")then
-            input_data = nil
-        end
+       
 
-        if(v[6])then
-            input_data = loadstring("return " .. input_data)()
+        -- frame is a checkbox  
+        if(type(v[4]) == "boolean")then
+
+            local isChecked = frame:GetChecked() or false
+            
             if(v[5][3])then
-                ERB_options[v[5][1]][v[5][3]][v[5][2]] = input_data
+                ERB_options[v[5][1]][v[5][3]][v[5][2]] = isChecked
             else
-                ERB_options[v[5][1]][v[5][2]] = input_data
+                ERB_options[v[5][1]][v[5][2]] = isChecked
             end
+
         else
-            if(input_data == "false")then
+            local input_data = frame:GetText()
+            if(input_data == "" or input_data == "nil")then
+                input_data = nil
+            end
+
+            if(v[6])then
+                input_data = loadstring("return " .. input_data)()
                 if(v[5][3])then
-                    ERB_options[v[5][1]][v[5][3]][v[5][2]] = false
+                    ERB_options[v[5][1]][v[5][3]][v[5][2]] = input_data
                 else
-                    ERB_options[v[5][1]][v[5][2]] = false
-                end
-            elseif(input_data == "true")then
-                if(v[5][3])then
-                    ERB_options[v[5][1]][v[5][3]][v[5][2]] = true
-                else
-                    ERB_options[v[5][1]][v[5][2]] = true
+                    ERB_options[v[5][1]][v[5][2]] = input_data
                 end
             else
                 if(v[5][3])then
@@ -664,6 +691,8 @@ local function SaveData()
                 end
             end
         end
+
+        
 
     end
 
@@ -684,6 +713,11 @@ local function ResetData()
             end
             table_string =  string.sub(table_string, 1, -3)
             frame:SetText("{"..table_string.."}")
+        elseif(type(v[4]) == "boolean")then
+
+            local isChecked = v[4]
+            frame:SetChecked(isChecked)
+
         else
             frame:SetText(tostring(v[4]))
         end
@@ -757,7 +791,11 @@ SlashCmdList["ERB"] = function(self, txt)
 
         for k,v in pairs(CONFIG_SETTINGS) do
             
-            CreateInputField(v[1], v[2], column, row, v[3], v[6])
+            if(type(v[4]) == "boolean") then
+                CreateCheckbox(v[1], v[2], column, row, v[3], v[6])
+            else
+                CreateInputField(v[1], v[2], column, row, v[3], v[6])
+            end
 
             if(column > (NR_OF_COLUMNS - 2))then
                 column = 0
