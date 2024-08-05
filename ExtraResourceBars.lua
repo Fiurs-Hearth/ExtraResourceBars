@@ -267,6 +267,7 @@ function ERB_apply_settings(data, frame_name)
         v.frame.text:SetText((string.format("%.0f%%", (unitPower/maxPower)*100)) .."  "..unitPower.." / "..maxPower)
     end
 
+    v.frame:Show()
     if(v.hide_when_full)then
 
         local unitPower, maxPower
@@ -283,25 +284,33 @@ function ERB_apply_settings(data, frame_name)
             if(UnitAffectingCombat("player") and v.only_combat)then
                 v.frame:Show()
             end
-        else
-            v.frame:Show()
         end
     end
 
     v.frame:SetScript("OnEvent", function()
+        local type = ERB_options[this:GetName()].type
+        local unitPower, maxPower, gradiantHP
         
         if(ERB_options[this:GetName()]['only_combat'])then
             -- fade in
-            if(ERB_options[this:GetName()].hide_when_full)then
 
-            else
-                if(event == "PLAYER_REGEN_DISABLED") then
-                    this:Show()
-                    ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], true)
+            if(event == "PLAYER_REGEN_DISABLED" and not(this:IsVisible())) then
+                this:Show()
+                ERB_fader(this, ERB_options[this:GetName()]['fade_in_time'], true)
+            end
+            -- fade out
+            if(event == "PLAYER_REGEN_ENABLED")then
+                this:Show()
+                if(ERB_options[this:GetName()].hide_when_full)then
+                    if(type==1)then
+                        unitPower = UnitHealth("player")
+                        maxPower = UnitHealthMax("player")
+                    elseif(type==2)then
+                        unitPower = UnitMana("player")
+                        maxPower = UnitManaMax("player")
+                    end
                 end
-                -- fade out
-                if(event == "PLAYER_REGEN_ENABLED")then
-                    this:Show()
+                if(ERB_options[this:GetName()].hide_when_full and unitPower == maxPower or not(ERB_options[this:GetName()].hide_when_full))then
                     ERB_fader(this, ERB_options[this:GetName()]['fade_out_time'], false)
                 end
             end
@@ -310,9 +319,7 @@ function ERB_apply_settings(data, frame_name)
         local u = arg1
         local form = false
         if(u == "player")then
-            local type = ERB_options[this:GetName()].type
             local textType = ERB_options[this:GetName()].textType
-            local unitPower, maxPower, gradiantHP
             if(type==1)then
                 gradiantHP = ERB_options[this:GetName()].gradiantHP
                 unitPower = UnitHealth("player")
@@ -333,6 +340,7 @@ function ERB_apply_settings(data, frame_name)
             end
 
             if(ERB_options[this:GetName()].hide_when_full)then
+
                 if(unitPower == maxPower or ERB_options[this:GetName()].type == 2 and ERB_options[this:GetName()]['powers'].main == "rage" and unitPower == 0) then
                     -- Show even when full if only_combat is set to true
                     if(UnitAffectingCombat("player") and ERB_options[this:GetName()].only_combat)then
@@ -530,9 +538,7 @@ function ERB_Load()
 
         local unitPower, maxPower
         for k,v in pairs(ERB_options) do
-
             ERB_apply_settings(v, k)
-
         end
 
     end)
@@ -729,6 +735,7 @@ end
 SLASH_ERB1 = "/erb"
 SlashCmdList["ERB"] = function(self, txt)
     local config_frame
+    
     -- Create config frame if it doesn't exist
     if(not(_G[CONFIG_FRAME_NAME]))then
         
