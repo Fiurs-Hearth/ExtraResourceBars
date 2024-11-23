@@ -120,9 +120,7 @@ end
 function ERB_apply_settings(data, frame_name)
 
     local v = data
-
-    v.frame:Show()
-
+	
     -- TODO: Make a function of appropiate code and run it in SaveData as well.
     v.frame = _G[frame_name]
 
