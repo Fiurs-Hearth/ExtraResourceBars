@@ -122,9 +122,6 @@ function ERB_apply_settings(data, frame_name)
     local v = data
 
     v.frame:Show()
-    if(v.hide)then
-        v.frame:Hide()
-    end
 
     -- TODO: Make a function of appropiate code and run it in SaveData as well.
     v.frame = _G[frame_name]
@@ -423,6 +420,10 @@ function ERB_apply_settings(data, frame_name)
         end
     end
 
+    if(v.hide)then
+        v.frame:Hide()
+    end
+	
 end
 
 function ERB_Load()
