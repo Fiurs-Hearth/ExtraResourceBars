@@ -376,7 +376,7 @@ function ERB_apply_settings(data, frame_name)
             end
 
             -- gradiant hp
-            if(type==1 and gradiantHP == true)then
+            if(type==1 and (gradiantHP == true or gradiantHP == 1))then
                 local r,g,b
                 local healthPercent = UnitHealth("player") / UnitHealthMax("player");	
                 if(healthPercent < 0.5)then
